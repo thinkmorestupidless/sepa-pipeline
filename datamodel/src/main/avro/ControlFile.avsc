@@ -1,0 +1,43 @@
+{
+  "namespace": "xeffe.sepa.data",
+  "type": "record",
+  "name": "ControlFile",
+  "fields":[
+    {
+      "name": "controlId",
+      "type": "string"
+    },
+    {
+      "name": "fileName",
+      "type": "string"
+    },
+    {
+      "name":"transactions",
+      "type":{
+        "type": "array",
+        "items":{
+          "name":"Transaction",
+          "type":"record",
+          "fields": [
+            {
+              "name":"txId",
+              "type":"string"
+            },
+            {
+              "name": "from",
+              "type": "string"
+            },
+            {
+              "name": "to",
+              "type": "string"
+            },
+            {
+              "name": "amount",
+              "type": "int"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

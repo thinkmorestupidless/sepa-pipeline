@@ -1,0 +1,15 @@
+{
+  "namespace": "xeffe.sepa.data",
+  "type": "record",
+  "name": "MonitoringFile",
+  "fields":[
+    {
+      "name": "transaction",
+      "type": "Transaction"
+    },
+    {
+      "name": "fileName",
+      "type": "string"
+    }
+  ]
+}

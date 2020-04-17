@@ -14,7 +14,7 @@ lazy val root =
     .aggregate(
       sepaPipeline,
       datamodel,
-      xCloudflow,
+      `cloudflow-extensions`,
       akkaScala,
       akkaJava,
       sparkAggregation
@@ -43,9 +43,9 @@ lazy val akkaScala = appModule("akka-scala")
         "org.scalatest"             %% "scalatest"              % "3.0.8"    % "test"
       )
     )
-  .dependsOn(datamodel)
+  .dependsOn(datamodel, `cloudflow-extensions`)
 
-lazy val xCloudflow = appModule("cloudflow-extensions")
+lazy val `cloudflow-extensions` = appModule("cloudflow-extensions")
   .enablePlugins(CloudflowAkkaStreamsLibraryPlugin)
   .settings(
     commonSettings,

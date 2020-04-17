@@ -1,0 +1,15 @@
+{
+  "namespace": "xeffe.sepa.data",
+  "type": "record",
+  "name": "ProcessableTransaction",
+  "fields":[
+    {
+      "name": "transaction",
+      "type": "Transaction"
+    },
+    {
+      "name": "controlId",
+      "type": "string"
+    }
+  ]
+}

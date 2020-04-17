@@ -1,0 +1,23 @@
+{
+  "namespace": "xeffe.sepa.data",
+  "type": "record",
+  "name": "Transaction",
+  "fields":[
+    {
+      "name":"txId",
+      "type":"string"
+    },
+    {
+      "name": "from",
+      "type": "string"
+    },
+    {
+      "name": "to",
+      "type": "string"
+    },
+    {
+      "name": "amount",
+      "type": "int"
+    }
+  ]
+}
