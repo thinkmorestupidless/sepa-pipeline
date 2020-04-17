@@ -14,6 +14,7 @@ lazy val root =
     .aggregate(
       sepaPipeline,
       datamodel,
+      xCloudflow,
       akkaScala,
       akkaJava,
       sparkAggregation
@@ -42,6 +43,25 @@ lazy val akkaScala = appModule("akka-scala")
         "org.scalatest"             %% "scalatest"              % "3.0.8"    % "test"
       )
     )
+  .dependsOn(datamodel)
+
+lazy val xCloudflow = appModule("cloudflow-extensions")
+  .enablePlugins(CloudflowAkkaStreamsLibraryPlugin)
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-cluster" % "2.5.24",
+      "com.lightbend.akka.management" %% "akka-management" % "1.0.3",
+      "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.0.3",
+      "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % "1.0.3",
+      "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % "1.0.3",
+      "com.typesafe.akka" %% "akka-discovery" % "2.5.24",
+      "com.typesafe.akka" %% "akka-cluster-sharding" % "2.5.24",
+      "com.typesafe.akka"         %% "akka-http-spray-json"   % "10.1.10",
+      "ch.qos.logback"            %  "logback-classic"        % "1.2.3",
+      "org.scalatest"             %% "scalatest"              % "3.0.8"    % "test"
+    )
+  )
   .dependsOn(datamodel)
 
 lazy val akkaJava = appModule("akka-java")
