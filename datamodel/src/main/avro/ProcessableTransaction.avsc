@@ -6,10 +6,6 @@
     {
       "name": "transaction",
       "type": "Transaction"
-    },
-    {
-      "name": "controlId",
-      "type": "string"
     }
   ]
 }
