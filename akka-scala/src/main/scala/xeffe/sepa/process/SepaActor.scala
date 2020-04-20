@@ -1,4 +1,4 @@
-package xeffe.sepa
+package xeffe.sepa.process
 
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.sharding.ShardRegion
@@ -14,7 +14,7 @@ object SepaActor {
     case tx: Transaction => (tx.txId, tx)
   }
 
-  private val numberOfShards = 100
+  private val numberOfShards = 10
 
   val extractShardId: ShardRegion.ExtractShardId = {
     case file: MonitoringFile ⇒ (file.transaction.txId.hashCode % numberOfShards).toString
@@ -30,22 +30,28 @@ class SepaActor extends Actor with ActorLogging {
   def receiving(monitoringFile: Option[MonitoringFile], transaction: Option[Transaction]): Receive = {
 
     case file: MonitoringFile =>
-      become(completed)
 
       val response = transaction match {
-        case Some(x) => Yep(file, x)
-        case None => Nope
+        case Some(x) =>
+          become(completed)
+          Yep(file, x)
+        case None =>
+          become(receiving(Some(file), transaction))
+          Nope
       }
 
       sender() ! response
 
 
     case transaction: Transaction =>
-      become(completed)
 
       val response = monitoringFile match {
-        case Some(x) => Yep(x, transaction)
-        case None => Nope
+        case Some(x) =>
+          become(completed)
+          Yep(x, transaction)
+        case None =>
+          become(receiving(monitoringFile, Some(transaction)))
+          Nope
       }
 
       sender() ! response

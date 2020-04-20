@@ -15,7 +15,12 @@ class TransactionLogger extends AkkaStreamlet {
 
   override protected def createLogic(): AkkaStreamletLogic = new RunnableGraphStreamletLogic() {
     override def runnableGraph(): RunnableGraph[_] = {
-      plainSource(in).to(Sink.foreach(println))
+      sourceWithOffsetContext(in).map { tx =>
+      println(tx)
+        log.info(s"received tx -> $tx")
+        tx
+      }
+      .to(Sink.ignore)
     }
   }
 }
