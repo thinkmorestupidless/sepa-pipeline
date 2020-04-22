@@ -1,6 +1,8 @@
 import sbt._
 import sbt.Keys._
 
+val akkaVersion = "2.5.29"
+
 lazy val root =
   Project(id = "root", base = file("."))
     .enablePlugins(ScalafmtPlugin)
@@ -37,7 +39,10 @@ lazy val akkaScala = appModule("akka-scala")
     .settings(
       commonSettings,
       libraryDependencies ++= Seq(
-        "com.typesafe.akka"         %% "akka-cluster-sharding"  % "2.5.29",
+        "com.typesafe.akka"         %% "akka-cluster-sharding"  % akkaVersion,
+        "com.typesafe.akka"         %% "akka-persistence"       % akkaVersion,
+        "com.github.dnvriend"       %% "akka-persistence-jdbc"  % "3.5.3",
+        "org.postgresql"            % "postgresql"              % "42.1.4",
         "ch.qos.logback"            %  "logback-classic"        % "1.2.3",
         "org.scalatest"             %% "scalatest"              % "3.0.8"    % "test"
       )

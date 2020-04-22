@@ -1,12 +1,26 @@
 package xeffe.sepa.process
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.{ActorLogging, ActorRef}
 import akka.cluster.sharding.ShardRegion
+import akka.persistence.PersistentActor
 import xeffe.sepa.data.{MonitoringFile, Transaction}
 
 trait SepaActorResponse
 case object Nope extends SepaActorResponse
 case class Yep(monitoringFile: MonitoringFile, transaction: Transaction) extends SepaActorResponse
+
+case class MonitoringFileAdded(file: MonitoringFile)
+case class TransactionAdded(tx: Transaction)
+
+case class SepaState(monitoringFile: Option[MonitoringFile], transaction: Option[Transaction]) {
+  def isComplete() =
+    monitoringFile.isDefined && transaction.isDefined
+}
+
+object SepaState {
+  def apply(): SepaState =
+    SepaState(None, None)
+}
 
 object SepaActor {
   val extractEntityId: ShardRegion.ExtractEntityId = {
@@ -22,47 +36,53 @@ object SepaActor {
   }
 }
 
-class SepaActor extends Actor with ActorLogging {
-  import context.become
+class SepaActor extends PersistentActor with ActorLogging {
 
-  override def receive: Receive = receiving(None, None)
+  var state: SepaState = SepaState()
 
-  def receiving(monitoringFile: Option[MonitoringFile], transaction: Option[Transaction]): Receive = {
+  def reply(state: SepaState, replyTo: ActorRef): Unit = {
+    if (state.isComplete()) {
+      replyTo ! Yep(state.monitoringFile.get, state.transaction.get)
+    } else {
+      replyTo ! Nope
+    }
+  }
+
+  override def receiveRecover: Receive = {
+
+    case fileAdded: MonitoringFileAdded =>
+      state = state.copy(monitoringFile = Some(fileAdded.file))
+
+    case txAdded: TransactionAdded =>
+      state = state.copy(transaction = Some(txAdded.tx))
+  }
+
+  override def receiveCommand: Receive = {
 
     case file: MonitoringFile =>
+      val replyTo = sender()
 
-      val response = transaction match {
-        case Some(x) =>
-          become(completed)
-          Yep(file, x)
-        case None =>
-          become(receiving(Some(file), transaction))
-          Nope
+      state.monitoringFile.fold {
+        persist(MonitoringFileAdded(file)) { evt =>
+          state = state.copy(monitoringFile = Some(evt.file))
+          reply(state, replyTo)
+        }
+      } { _ =>
+        reply(state, replyTo)
       }
-
-      sender() ! response
-
 
     case transaction: Transaction =>
+      val replyTo = sender()
 
-      val response = monitoringFile match {
-        case Some(x) =>
-          become(completed)
-          Yep(x, transaction)
-        case None =>
-          become(receiving(monitoringFile, Some(transaction)))
-          Nope
+      state.transaction.fold {
+        persist(TransactionAdded(transaction)) { evt =>
+          state = state.copy(transaction = Some(evt.tx))
+          reply(state, replyTo)
+        }
+      } { _ =>
+        reply(state, replyTo)
       }
-
-      sender() ! response
   }
 
-  def completed: Receive = {
-
-    case _: MonitoringFile =>
-      sender ! Nope
-
-    case _: Transaction =>
-      sender ! Nope
-  }
+  override def persistenceId: String = self.path.name
 }
