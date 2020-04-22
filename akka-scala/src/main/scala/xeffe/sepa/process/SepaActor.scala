@@ -38,6 +38,8 @@ object SepaActor {
 
 class SepaActor extends PersistentActor with ActorLogging {
 
+  override def journalPluginId = "jdbc-journal"
+
   var state: SepaState = SepaState()
 
   def reply(state: SepaState, replyTo: ActorRef): Unit = {

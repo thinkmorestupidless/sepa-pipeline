@@ -26,6 +26,9 @@ class SepaCluster extends AkkaStreamlet with Clustering {
   val shape = StreamletShape.withInlets(monitoringFileInlet, transactionInlet).withOutlets(out)
 
   override def createLogic = new RunnableGraphStreamletLogic() {
+
+    system.logConfiguration()
+
     override def runnableGraph(): RunnableGraph[_] =
       RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
         import GraphDSL.Implicits._

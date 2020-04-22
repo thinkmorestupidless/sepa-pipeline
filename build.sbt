@@ -42,7 +42,7 @@ lazy val akkaScala = appModule("akka-scala")
         "com.typesafe.akka"         %% "akka-cluster-sharding"  % akkaVersion,
         "com.typesafe.akka"         %% "akka-persistence"       % akkaVersion,
         "com.github.dnvriend"       %% "akka-persistence-jdbc"  % "3.5.3",
-        "org.postgresql"            % "postgresql"              % "42.1.4",
+        "org.postgresql"            %  "postgresql"             % "42.1.4",
         "ch.qos.logback"            %  "logback-classic"        % "1.2.3",
         "org.scalatest"             %% "scalatest"              % "3.0.8"    % "test"
       )
